@@ -1,6 +1,7 @@
 package lock
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -15,11 +16,10 @@ type LocalLockClient struct {
 	ExpirationTime time.Duration
 }
 
-func NewLocalLockClient(expirationTime, purgeTime int) *LocalLockClient {
-	c := c.New(time.Duration(expirationTime)*time.Minute, time.Duration(purgeTime)*time.Minute)
+func NewLocalLockClient() *LocalLockClient {
+	c := c.New(time.Duration(-1), time.Duration(-1))
 	return &LocalLockClient{
-		Keys:           c,
-		ExpirationTime: time.Duration(expirationTime),
+		Keys: c,
 	}
 }
 
@@ -57,15 +57,10 @@ func (lock LocalLock) Lock() error {
 }
 
 func (lock LocalLock) Unlock() error {
-
 	var m *sync.Mutex
 	val, found := lock.Client.Keys.Get(lock.Key)
 	if !found {
-		m = &sync.Mutex{}
-		err := lock.Client.Keys.Add(lock.Key, m, lock.Client.ExpirationTime)
-		if err != nil {
-			return err
-		}
+		return fmt.Errorf("Unlock mutex not found.")
 	} else {
 		m = val.(*sync.Mutex)
 	}
