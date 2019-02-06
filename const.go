@@ -5,11 +5,9 @@ const (
 	doubleQuote rune = '"'
 	backslash   rune = '\\'
 	pctSymbol   rune = '%'
-	// Gremlin client allows the following:
-	//     - all alphanumeric characters
-	//     - all whitespace charaters
-	//     - the following punctuation: \, ;, ., :, /, -, ?, !, *, (, ), &, _, =, ,, #, ?, !, ", +
-	ARG_REGEX = "^[\\d\\w\\s\\\\;\\.\\:\\/\\-\\?\\!\\*\\(\\)\\&\\_\\=\\,\\#\\?\\!\\'\\>\\<\"\\+]+$"
+
+	// Gremlin client does not allow Unassigned characters
+	ARG_REGEX = "\\p{C}+"
 
 	// Gremlin stack defaults
 	DEFAULT_MAX_CAP             = 10

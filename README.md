@@ -4,6 +4,23 @@ This library will allow you to connect to any graph database that supports Tinke
 
 This library developed by the engineering department at [CB Insights](https://www.cbinsights.com/)
 
+# Table of Contents
+1. [Installation](#installation)
+2. [Usage](#usage)
+	1. [Gremlin Stack](#gremlin-stack)
+		1. [Creating the Gremlin Stack](#creating-the-gremlin-stack)
+		2. [Stack Options](#stack-options)
+	2. [Querying the Database](#querying-the-database)
+	3. [Reading the Response](#reading-the-response)
+	4. [Locking](#locking)
+		1. [Local Lock](#local-lock)
+		2. [Consul Lock](#consul-lock)
+		3. [Consul Combination Lock](#consul-combination-lock)
+	5. [Authentication](#authentication)
+	6. [Limitations](#limitations)
+3. [Go-Gremlin Usage Notes](#go-gremlin-usage-notes)
+
+
 
 Installation
 ==========
@@ -81,7 +98,9 @@ If the LockClient is nil, it will default to using the `LocalLockClient`.
 
 Logger, Tracer and Instr are ignored if nil.
 
-### Querying the database
+
+Querying the Database
+-----------------------
 
 To query the database, using your stack, call `ExecQueryF()`, which requires a Context.context object:
 ```go
@@ -109,7 +128,9 @@ Optionally, you may parameterize the query and pass arguments into `ExecQueryF()
 ```
 The gremlin client will handle the interpolation of the query, and escaping any characters that might be necessary.
 
-### Reading the response
+
+Reading the Response
+----------------------
 
 `ExecQueryF()` will return the string response returned by your Gremlin instance, which may look something like this:
 ```json
@@ -173,7 +194,8 @@ In addition, there are provided utilities to convert to "CleanVertexes" and "Cle
 `ConvertToCleanEdges()` converts an `Edge` object as seen above into a much simpler `CleanEdge` with only an ID and a Label
 
 
-### Locking
+Locking
+----------
 
 The Gremlin client is designed to accept a `LockClient` interface, with a client that implements a `LockKey(key string)` function to retrieve a `Lock` from the client.
 
@@ -185,7 +207,7 @@ The `Lock` interface implements 3 functions:
 
 In addition to the generic interface, two implementations have been provided, a local implementation and one for Consul.
 
-#### Local Lock
+### Local Lock
 
 The local lock uses a Cache of Mutexes (from [go-cache](https://github.com/patrickmn/go-cache), so that for a given LocalKey passed in by the query, the Mutex will lock writes on that key. For instance, if we are operating on
 a Vertex and expect simultaneous writes to that Vertex's properties, we can lock the Mutex corresponding to the Vertex ID to avoid a ConcurrentModificationException.
@@ -193,7 +215,7 @@ a Vertex and expect simultaneous writes to that Vertex's properties, we can lock
 However, this system only works for a single client, so a distributed system, or a system with multiple writer clients will still be at risk of concurrency exceptions.
 
 
-#### Consul Lock
+### Consul Lock
 
 The Consul lock uses the Consul API to prevent ConcurrentModificationExceptions. Similar to the Local Lock, we can pass in a Vertex ID to avoid a ConcurrentModificationException.
 But, instead of writing to a local Map, it writes to Consul's KV configs, acquiring and releasing the corresponding configs as necessary, with a timeout to ensure that operations running too long, or operations that have been cancelled, do not retain their lock on the key.
@@ -201,26 +223,53 @@ But, instead of writing to a local Map, it writes to Consul's KV configs, acquir
 For more information about Consul Distributed Key implementations, check the [Consul API docs](https://godoc.org/github.com/hashicorp/consul/api#Lock) and this [quick implementation guide](https://medium.com/@mthenw/distributed-locks-with-consul-and-golang-c4eccc217dd5)
 
 
-#### Consul Combination Lock
+### Consul Combination Lock
 
 The Consul Combination lock is a union of both the Local and Consul Locks, designed to handle the speed issues inherent in polling Consul.
 
 Like the local lock, it implements a
 
 
-### Limitations
+Authentication
+---------------
+For authentication, you can set environment variables `GREMLIN_USER` and `GREMLIN_PASS` and create a `Client`, passing functional parameter `OptAuthEnv`
 
-The Gremlin client forces some restraints on the characters allowed in a gremlin query to avoid issues with the query syntax. Currently the allowed characters are:
+```go
+	auth := gremlin.OptAuthEnv()
+	myStack, err := gremlin.NewGremlinStackSimple("ws://server1:8182/gremlin", maxPoolCapacity, maxRetries, verboseLogging, auth)
+	data, err = client.ExecQueryF(`g.V()`)
+	if err != nil {
+		panic(err)
+	}
+	doStuffWith(data)
+```
 
-1. All alpha-numeric characters
+If you don't like environment variables you can authenticate passing username and password string in the following way:
+```go
+	auth := gremlin.OptAuthUserPass("myusername", "mypass")
+	myStack, err := gremlin.NewGremlinStackSimple("ws://server1:8182/gremlin", maxPoolCapacity, maxRetries, verboseLogging, auth)
+	data, err = client.ExecQueryF(`g.V()`)
+	if err != nil {
+		panic(err)
+	}
+	doStuffWith(data)
+```
 
-2. All whitespace characters
 
-3. The following punctuation: \, ;, ., :, /, -, ?, !, \*, (, ), &, \_, =, ,, #, ?, !, ", +
+Limitations
+------------
+
+The Gremlin client forces some restraints on the characters allowed in a gremlin query to avoid issues with the query syntax and the database.
+
+Currently only characters that fall under 'Other' code points are excluded.
+
+These include invisible control characters, invisible formatting indicators, private and unassigned code points, and halves of UTF-16 surrogate pairs.
+
+For more information on these code points, check out the descriptions of [Unicode Character Categories](https://www.fileformat.info/info/unicode/category/index.htm) and their [Regex Definitions](https://www.regular-expressions.info/unicode.html#category).
 
 
 Go-Gremlin Usage Notes
----------
+========================
 Note: This is the usage defined by the library from which this is forked ([github.com/go-gremlin/gremlin](github.com/go-gremlin/gremlin))
 Export the list of databases you want to connect to as `GREMLIN_SERVERS` like so:-
 ```bash
@@ -267,29 +316,4 @@ You can also execute a query with Session, Transaction and Aliases
 	aliases["g"] = fmt.Sprintf("%s.g", "demo-graph")
 	session := "de131c80-84c0-417f-abdf-29ad781a7d04"  //use UUID generator
 	data, err := gremlin.Query(`g.V().has("name", userName).valueMap()`).Bindings(gremlin.Bind{"userName": "john"}).Session(session).ManageTransaction(true).SetProcessor("session").Aliases(aliases).Exec()
-```
-
-Authentication
-===
-For authentication, you can set environment variables `GREMLIN_USER` and `GREMLIN_PASS` and create a `Client`, passing functional parameter `OptAuthEnv`
-
-```go
-	auth := gremlin.OptAuthEnv()
-	myStack, err := gremlin.NewGremlinStackSimple("ws://server1:8182/gremlin", maxPoolCapacity, maxRetries, verboseLogging, auth)
-	data, err = client.ExecQueryF(`g.V()`)
-	if err != nil {
-		panic(err)
-	}
-	doStuffWith(data)
-```
-
-If you don't like environment variables you can authenticate passing username and password string in the following way:
-```go
-	auth := gremlin.OptAuthUserPass("myusername", "mypass")
-	myStack, err := gremlin.NewGremlinStackSimple("ws://server1:8182/gremlin", maxPoolCapacity, maxRetries, verboseLogging, auth)
-	data, err = client.ExecQueryF(`g.V()`)
-	if err != nil {
-		panic(err)
-	}
-	doStuffWith(data)
 ```

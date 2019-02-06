@@ -2,6 +2,8 @@ package gremlin
 
 import (
 	"bytes"
+	"fmt"
+	"regexp"
 )
 
 func CharSliceToMap(chars []rune) map[rune]bool {
@@ -45,10 +47,24 @@ func escapeCharacters(value string, escapeChars map[rune]bool) string {
 
 	for _, char := range value {
 		if escapeChars[char] {
-			buffer.WriteRune(backslash)
+			if char == pctSymbol {
+				buffer.WriteRune(pctSymbol)
+			} else {
+				buffer.WriteRune(backslash)
+			}
 		}
 		buffer.WriteRune(char)
 	}
-
 	return buffer.String()
+}
+
+func MakeGremlinQuery(gremlinQuery GremlinQuery, argRegexP *regexp.Regexp) (string, error) {
+	args := EscapeArgs(gremlinQuery.Args, EscapeGremlin)
+	for _, arg := range args {
+		// if the argument is not a string (i.e. an int) or matches the regex string, then we're good
+		if InterfaceToString(arg) != "" && argRegexP.MatchString(InterfaceToString(arg)) {
+			return "", fmt.Errorf("Invalid character in your query argument: %s", InterfaceToString(arg))
+		}
+	}
+	return fmt.Sprintf(gremlinQuery.Query, args...), nil
 }
