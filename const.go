@@ -6,7 +6,7 @@ const (
 	backslash   rune = '\\'
 	pctSymbol   rune = '%'
 
-	// Gremlin client does not allow Unassigned characters
+	// Gremlin client does not allow Other characters
 	ARG_REGEX = "\\p{C}+"
 
 	// Gremlin stack defaults
