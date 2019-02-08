@@ -173,7 +173,7 @@ func TestMakeGremlinQuery(t *testing.T) {
 }
 
 func TestMakeGremlinQueryError(t *testing.T) {
-	// Testing charactres we don't allow
+	// Testing characters we don't allow
 	argRegexp, _ := regexp.Compile(ARG_REGEX)
 
 	testCases := []struct {
