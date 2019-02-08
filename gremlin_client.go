@@ -46,19 +46,14 @@ func NewGremlinClient(urlStr string, maxCap int, maxRetries int, verboseLogging 
 }
 
 func (c *GremlinClient) ExecQueryF(ctx context.Context, gremlinQuery GremlinQuery) (string, error) {
-	args := EscapeArgs(gremlinQuery.Args, EscapeGremlin)
-	for _, arg := range args {
-		// if the argument is not a string (i.e. an int) or matches the regex string, then we're good
-		if InterfaceToString(arg) != "" && !c.argRegexp.MatchString(InterfaceToString(arg)) {
-			return "", fmt.Errorf("Invalid character in your query argument: %s", InterfaceToString(arg))
-		}
+	query, err := MakeGremlinQuery(gremlinQuery, c.argRegexp)
+	if err != nil {
+		return "", err
 	}
-	query := fmt.Sprintf(gremlinQuery.Query, args...)
 	rawResponse, err := c.execWithRetry(ctx, query, gremlinQuery.LockKey)
 	if err != nil {
 		return "", err
 	}
-
 	return string(rawResponse), nil
 }
 
@@ -120,9 +115,14 @@ func (c *GremlinClient) execWithRetry(ctx context.Context, query string, queryId
 			if err != nil {
 				return nil, err
 			}
-			defer lock.Unlock()
 		}
 		rawResponse, err = client.ExecQuery(query)
+		if hasKey {
+			err = lock.Unlock()
+			if err != nil {
+				return nil, err
+			}
+		}
 
 		if err == nil { // success, break out of the retry loop
 			break
