@@ -117,6 +117,39 @@ func TestSerializeGenericValue(t *testing.T) {
 	}
 }
 
+func TestSerializeListInterface(t *testing.T) {
+	var testCases = []struct {
+		given    string
+		expected []interface{}
+	}{
+		// 1. Empty string
+		{`[]`, []interface{}{}},
+		// 2. Single value
+		{`["test"]`, []interface{}{"test"}},
+		// 3. Multiple values
+		{`["test", "test2", "test3"]`, []interface{}{"test", "test2", "test3"}},
+		// 4. Multiple values, mixed types
+		{`["test", true, 3.12]`, []interface{}{"test", true, 3.12}},
+	}
+
+	for _, test := range testCases {
+		result, err := SerializeListInterface(test.given)
+		if err != nil {
+			t.Error("given", test.given, "expected", test.expected, "result", result, "err", err)
+		}
+		if len(result) != len(test.expected) {
+			t.Error("given", test.given, "expected", test.expected, "result", result, "err", err)
+		}
+		for i, resultVal := range result {
+			resultValString := fmt.Sprintf("%v", resultVal)
+			expectedValString := fmt.Sprintf("%v", test.expected[i])
+			if resultValString != expectedValString {
+				t.Error("given", test.given, "expected", test.expected, "result", result, "err", err)
+			}
+		}
+	}
+}
+
 func TestConvertToCleanVertexes(t *testing.T) {
 	givens := [][]Vertex{
 		{},
