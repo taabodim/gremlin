@@ -2,6 +2,7 @@ package gremlin
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -130,6 +131,8 @@ func TestSerializeListInterface(t *testing.T) {
 		{`["test", "test2", "test3"]`, []interface{}{"test", "test2", "test3"}},
 		// 4. Multiple values, mixed types
 		{`["test", true, 3.12]`, []interface{}{"test", true, 3.12}},
+		// 5. Multiple values, nested types
+		{`[[1], {"a": 1}]`, []interface{}{[]interface{}{1}, map[string]interface{}{"a": 1}}},
 	}
 
 	for _, test := range testCases {
@@ -140,11 +143,11 @@ func TestSerializeListInterface(t *testing.T) {
 		if len(result) != len(test.expected) {
 			t.Error("given", test.given, "expected", test.expected, "result", result, "err", err)
 		}
-		for i, resultVal := range result {
-			resultValString := fmt.Sprintf("%v", resultVal)
-			expectedValString := fmt.Sprintf("%v", test.expected[i])
-			if resultValString != expectedValString {
-				t.Error("given", test.given, "expected", test.expected, "result", result, "err", err)
+		for i, r := range result {
+			expectedVal := reflect.ValueOf(test.expected[i])
+			resultVal := reflect.ValueOf(r)
+			if !reflect.DeepEqual(expectedVal.String(), resultVal.String()) {
+				t.Error("given", test.given, "expected", expectedVal.Type(), "result", resultVal, "err", err)
 			}
 		}
 	}
