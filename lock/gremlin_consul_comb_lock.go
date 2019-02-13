@@ -65,7 +65,7 @@ func (lock ConsulCombinationLock) Unlock() error {
 	if err != nil {
 		errResponse = fmt.Sprintf("%s. Local unlock error: %v", errResponse, err)
 	}
-	if err != nil {
+	if errResponse != "" {
 		return fmt.Errorf(errResponse)
 	}
 	return nil

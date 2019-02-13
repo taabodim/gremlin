@@ -42,6 +42,18 @@ func SerializeGenericValues(rawResponse string) (GenericValues, error) {
 	return response, nil
 }
 
+func SerializeListInterface(rawResponse string) ([]interface{}, error) {
+	var response []interface{}
+	if rawResponse == "" {
+		return response, nil
+	}
+	err := json.Unmarshal([]byte(rawResponse), &response)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
 func ConvertToCleanVertexes(vertexes Vertexes) []CleanVertex {
 	var responseVertexes []CleanVertex
 	for _, vertex := range vertexes {
