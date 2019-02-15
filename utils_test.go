@@ -96,16 +96,17 @@ func TestEscapeGremlin(t *testing.T) {
 	}
 }
 
-func TestEscapeArgs(t *testing.T) {
+func TestPrepareArgs(t *testing.T) {
 	tests := [][][]interface{}{
 		{{"blah"}, {"blah"}},
 		{{"blah", 1}, {"blah", 1}},
 		{{"blah", 1, `escape '`}, {"blah", 1, `escape \'`}},
+		{{`	`, ` this`, `this `, ` this `}, {``, `this`, `this`, `this`}},
 	}
 	for _, test := range tests {
 		given := test[0]
 		expected := fmt.Sprintf("%v", test[1])
-		result := fmt.Sprintf("%v", EscapeArgs(given, EscapeGremlin))
+		result := fmt.Sprintf("%v", PrepareArgs(given, EscapeGremlin))
 		if result != expected {
 			t.Error("given", given, "expected", expected, "result", result)
 		}
