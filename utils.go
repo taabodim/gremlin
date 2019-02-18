@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 func CharSliceToMap(chars []rune) map[rune]bool {
@@ -28,11 +29,11 @@ func CoalesceStrings(s ...string) string {
 	return ""
 }
 
-func EscapeArgs(args []interface{}, escapeFn func(string) string) []interface{} {
+func PrepareArgs(args []interface{}, escapeFn func(string) string) []interface{} {
 	for idx := range args {
 		switch args[idx].(type) {
 		case string:
-			args[idx] = escapeFn(args[idx].(string))
+			args[idx] = escapeFn(strings.TrimSpace(args[idx].(string)))
 		}
 	}
 	return args
@@ -59,7 +60,7 @@ func escapeCharacters(value string, escapeChars map[rune]bool) string {
 }
 
 func MakeGremlinQuery(gremlinQuery GremlinQuery, argRegexP *regexp.Regexp) (string, error) {
-	args := EscapeArgs(gremlinQuery.Args, EscapeGremlin)
+	args := PrepareArgs(gremlinQuery.Args, EscapeGremlin)
 	for _, arg := range args {
 		// if the argument is not a string (i.e. an int) or matches the regex string, then we're good
 		if InterfaceToString(arg) != "" && argRegexP.MatchString(InterfaceToString(arg)) {
