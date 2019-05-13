@@ -3,6 +3,7 @@ package gremlin
 import (
 	"bytes"
 	"fmt"
+	"reflect"
 	"regexp"
 	"strings"
 )
@@ -68,4 +69,60 @@ func MakeGremlinQuery(gremlinQuery GremlinQuery, argRegexP *regexp.Regexp) (stri
 		}
 	}
 	return fmt.Sprintf(gremlinQuery.Query, args...), nil
+}
+
+func InterfacesMatch(interface1, interface2 interface{}) bool {
+	switch interface1.(type) {
+	case map[string]interface{}:
+		val1Map := interface1.(map[string]interface{})
+		val2Map := interface2.(map[string]interface{})
+		if len(val1Map) != len(val2Map) {
+			return false
+		}
+		for k, val1 := range val1Map {
+			val2, ok := val2Map[k]
+			if !ok {
+				return false
+			}
+			if !InterfacesMatch(val1, val2) {
+				return false
+			}
+		}
+
+	case []interface{}:
+		val1List := interface1.([]interface{})
+		val2List := interface2.([]interface{})
+		if len(val1List) != len(val2List) {
+			return false
+		}
+		for i, val1Map := range val1List {
+			if !InterfacesMatch(val1Map, val2List[i]) {
+				return false
+			}
+		}
+
+	case []string:
+		val1List := interface1.([]string)
+		val2List := interface2.([]string)
+		if len(val1List) != len(val2List) {
+			return false
+		}
+		for i, val1Map := range val1List {
+			if !InterfacesMatch(val1Map, val2List[i]) {
+				return false
+			}
+		}
+
+	default:
+		if interface1 == nil && interface2 != nil {
+			return false
+		} else if interface1 != nil && interface2 == nil {
+			return false
+		} else if interface1 != nil && interface2 != nil {
+			if !reflect.DeepEqual(fmt.Sprintf("%v", interface1), fmt.Sprintf("%v", interface2)) {
+				return false
+			}
+		}
+	}
+	return true
 }
