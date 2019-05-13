@@ -30,10 +30,7 @@ type VertexValue struct {
 }
 
 func (v1 VertexValue) Equals(v2 VertexValue) bool {
-	if v1.ID != v2.ID || v1.Label != v2.Label {
-		return false
-	}
-	if len(v1.Properties) != len(v2.Properties) {
+	if v1.ID != v2.ID || v1.Label != v2.Label || len(v1.Properties) != len(v2.Properties) {
 		return false
 	}
 	for k, val1Slice := range v1.Properties {
