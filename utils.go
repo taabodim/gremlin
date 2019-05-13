@@ -75,8 +75,8 @@ func InterfacesMatch(interface1, interface2 interface{}) bool {
 	switch interface1.(type) {
 	case map[string]interface{}:
 		val1Map := interface1.(map[string]interface{})
-		val2Map := interface2.(map[string]interface{})
-		if len(val1Map) != len(val2Map) {
+		val2Map, ok := interface2.(map[string]interface{})
+		if !ok || len(val1Map) != len(val2Map) {
 			return false
 		}
 		for k, val1 := range val1Map {
@@ -91,8 +91,8 @@ func InterfacesMatch(interface1, interface2 interface{}) bool {
 
 	case []interface{}:
 		val1List := interface1.([]interface{})
-		val2List := interface2.([]interface{})
-		if len(val1List) != len(val2List) {
+		val2List, ok := interface2.([]interface{})
+		if !ok || len(val1List) != len(val2List) {
 			return false
 		}
 		for i, val1Map := range val1List {
@@ -103,8 +103,8 @@ func InterfacesMatch(interface1, interface2 interface{}) bool {
 
 	case []string:
 		val1List := interface1.([]string)
-		val2List := interface2.([]string)
-		if len(val1List) != len(val2List) {
+		val2List, ok := interface2.([]string)
+		if !ok || len(val1List) != len(val2List) {
 			return false
 		}
 		for i, val1Map := range val1List {
