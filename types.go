@@ -23,8 +23,15 @@ func (v1 Vertex) Equals(v2 Vertex) bool {
 	return v1.Type == v2.Type && v1.Value.Equals(v2.Value)
 }
 
+type IdTypeStruct struct {
+	Type  string      `json:"@type"`
+	Value int `json:"@value"`
+}
+
+type IdType IdTypeStruct
+
 type VertexValue struct {
-	ID         int                      `json:"id"`
+	ID         IdType                      `json:"id"`
 	Label      string                      `json:"label"`
 	Properties map[string][]VertexProperty `json:"properties"`
 }
