@@ -1,4 +1,4 @@
-module taabodim/gremlin
+module github.com/taabodim/gremlin
 
 go 1.12
 
