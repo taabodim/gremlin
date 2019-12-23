@@ -14,7 +14,7 @@ func MakeDummyVertexProperty(label string, value interface{}) VertexProperty {
 	}
 }
 
-func MakeDummyVertex(vertexID, vertexLabel string, params map[string]interface{}) Vertex {
+func MakeDummyVertex(vertexID int, vertexLabel string, params map[string]interface{}) Vertex {
 	properties := make(map[string][]VertexProperty)
 	for label, value := range params {
 		var vp []VertexProperty

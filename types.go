@@ -24,7 +24,7 @@ func (v1 Vertex) Equals(v2 Vertex) bool {
 }
 
 type VertexValue struct {
-	ID         string                      `json:"id"`
+	ID         int                      `json:"id"`
 	Label      string                      `json:"label"`
 	Properties map[string][]VertexProperty `json:"properties"`
 }
@@ -116,7 +116,7 @@ type CleanEdge struct {
 }
 
 type CleanVertex struct {
-	Id    string `json:"id"`
+	Id    int `json:"id"`
 	Label string `json:"label"`
 }
 
