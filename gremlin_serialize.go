@@ -58,7 +58,7 @@ func ConvertToCleanVertexes(vertexes Vertexes) []CleanVertex {
 	var responseVertexes []CleanVertex
 	for _, vertex := range vertexes {
 		responseVertexes = append(responseVertexes, CleanVertex{
-			Id:    vertex.Value.ID,
+			Id:    vertex.Value.ID.Value,
 			Label: vertex.Value.Label,
 		})
 	}
