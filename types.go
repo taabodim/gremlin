@@ -14,9 +14,16 @@ type GremlinResponse struct {
 
 type Vertexes []Vertex
 
+type VertexesV2 []VertexV2
+
 type Vertex struct {
 	Type  string      `json:"@type"`
 	Value VertexValue `json:"@value"`
+}
+
+type VertexV2 struct {
+	Type  string      `json:"@type"`
+	Value VertexValueV2 `json:"@value"`
 }
 
 func (v1 Vertex) Equals(v2 Vertex) bool {
@@ -29,6 +36,12 @@ type IdTypeStruct struct {
 }
 
 type IdType IdTypeStruct
+
+type VertexValueV2 struct {
+	ID         string                      `json:"id"`
+	Label      string                      `json:"label"`
+	Properties map[string][]VertexProperty `json:"properties"`
+}
 
 type VertexValue struct {
 	ID         IdType                      `json:"id"`

@@ -4,6 +4,18 @@ import (
 	"encoding/json"
 )
 
+func DeserializeVerticesV2(rawResponse string) (VertexesV2, error) {
+	var response VertexesV2
+	if rawResponse == "" {
+		return response, nil
+	}
+	err := json.Unmarshal([]byte(rawResponse), &response)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
 func SerializeVertexes(rawResponse string) (Vertexes, error) {
 	// TODO: empty strings for property values will cause invalid json
 	// make so it can handle that case
