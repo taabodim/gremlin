@@ -31,7 +31,19 @@ func DeserializeVerticesNew(rawResponse string) (VertexesV2, error) {
 	return response, nil
 }
 
-func SerializeEdges(rawResponse string) (Edges, error) {
+func DeserializeEdges(rawResponse string) (Edges, error) {
+	var response Edges
+	if rawResponse == "" {
+		return response, nil
+	}
+	err := json.Unmarshal([]byte(rawResponse), &response)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func DeserializeEdgesV2(rawResponse string) (Edges, error) {
 	var response Edges
 	if rawResponse == "" {
 		return response, nil

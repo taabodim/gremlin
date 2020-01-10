@@ -63,7 +63,7 @@ func TestSerializeEdges(t *testing.T) {
 
 	for i, given := range givens {
 		expected := expecteds[i]
-		result, err := SerializeEdges(given)
+		result, err := DeserializeEdges(given)
 
 		if err != nil || len(result) != len(expected) {
 			t.Error("given", given, "expected", expected, "result", result, "err", err)

@@ -109,10 +109,16 @@ func (g1 GenericValue) Equals(g2 GenericValue) bool {
 }
 
 type Edges []Edge
+type EdgesV2 []EdgeV2
 
 type Edge struct {
 	Type  string    `json:"@type"`
 	Value EdgeValue `json:"@value"`
+}
+
+type EdgeV2 struct {
+	Type  string    `json:"@type"`
+	Value EdgeValueV2 `json:"@value"`
 }
 
 type EdgeIdValueType struct {
