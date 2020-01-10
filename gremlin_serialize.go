@@ -17,7 +17,7 @@ func DeserializeVertices(rawResponse string) (Vertexes, error) {
 	return response, nil
 }
 
-func DeserializeVerticesNew(rawResponse string) (VertexesV2, error) {
+func DeserializeVerticesV2(rawResponse string) (VertexesV2, error) {
 	// TODO: empty strings for property values will cause invalid json
 	// make so it can handle that case
 	var response VertexesV2
@@ -43,8 +43,8 @@ func DeserializeEdges(rawResponse string) (Edges, error) {
 	return response, nil
 }
 
-func DeserializeEdgesV2(rawResponse string) (Edges, error) {
-	var response Edges
+func DeserializeEdgesV2(rawResponse string) (EdgesV2, error) {
+	var response EdgesV2
 	if rawResponse == "" {
 		return response, nil
 	}
