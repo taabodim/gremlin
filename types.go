@@ -131,8 +131,8 @@ type EdIdType struct {
 }
 
 type EdgeValueType struct {
-	Type  int64 `json:"@type"`
-	Value int64 `json:"@value"`
+	Type  string `json:"@type"`
+	Value int64  `json:"@value"`
 }
 
 type EdgeValue struct {
