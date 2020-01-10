@@ -130,6 +130,11 @@ type EdIdType struct {
 	Value EdgeIdValueType `json:"@value"`
 }
 
+type EdgeValueType struct {
+	Type  int64 `json:"@type"`
+	Value int64 `json:"@value"`
+}
+
 type EdgeValue struct {
 	ID         string // TODO: does this need to be a GenericValue? interface{}?
 	Label      string
@@ -145,8 +150,8 @@ type EdgeValueV2 struct {
 	Label      string
 	InVLabel   string
 	OutVLabel  string
-	InV        string
-	OutV       string
+	InV        EdgeValueType
+	OutV       EdgeValueType
 	Properties map[string]EdgeProperty
 }
 
