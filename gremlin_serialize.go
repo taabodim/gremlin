@@ -2,10 +2,11 @@ package gremlin
 
 import (
 	"encoding/json"
+	"strconv"
 )
 
-func DeserializeVerticesV2(rawResponse string) (VertexesV2, error) {
-	var response VertexesV2
+func DeserializeVertices(rawResponse string) (Vertexes, error) {
+	var response Vertexes
 	if rawResponse == "" {
 		return response, nil
 	}
@@ -16,10 +17,10 @@ func DeserializeVerticesV2(rawResponse string) (VertexesV2, error) {
 	return response, nil
 }
 
-func SerializeVertexes(rawResponse string) (Vertexes, error) {
+func DeserializeVerticesNew(rawResponse string) (VertexesV2, error) {
 	// TODO: empty strings for property values will cause invalid json
 	// make so it can handle that case
-	var response Vertexes
+	var response VertexesV2
 	if rawResponse == "" {
 		return response, nil
 	}
@@ -69,8 +70,12 @@ func SerializeListInterface(rawResponse string) ([]interface{}, error) {
 func ConvertToCleanVertexes(vertexes Vertexes) []CleanVertex {
 	var responseVertexes []CleanVertex
 	for _, vertex := range vertexes {
+		idAsInt, err := strconv.Atoi(vertex.Value.ID)
+		if err != nil {
+			panic(err)
+		}
 		responseVertexes = append(responseVertexes, CleanVertex{
-			Id:    vertex.Value.ID.Value,
+			Id:    idAsInt,
 			Label: vertex.Value.Label,
 		})
 	}

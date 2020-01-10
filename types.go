@@ -8,22 +8,22 @@ type GremlinQuery struct {
 
 // cbi made up, not a real graphson or gremlin thing
 type GremlinResponse struct {
-	V Vertexes
+	V VertexesV2
 	E Edges
 }
 
+type VertexesV2 []VertexV2
+
 type Vertexes []Vertex
 
-type VertexesV2 []VertexV2
+type VertexV2 struct {
+	Type  string        `json:"@type"`
+	Value VertexValueV2 `json:"@value"`
+}
 
 type Vertex struct {
 	Type  string      `json:"@type"`
 	Value VertexValue `json:"@value"`
-}
-
-type VertexV2 struct {
-	Type  string      `json:"@type"`
-	Value VertexValueV2 `json:"@value"`
 }
 
 func (v1 Vertex) Equals(v2 Vertex) bool {
@@ -37,13 +37,13 @@ type IdTypeStruct struct {
 
 type IdType IdTypeStruct
 
-type VertexValueV2 struct {
+type VertexValue struct {
 	ID         string                      `json:"id"`
 	Label      string                      `json:"label"`
 	Properties map[string][]VertexProperty `json:"properties"`
 }
 
-type VertexValue struct {
+type VertexValueV2 struct {
 	ID         IdType                      `json:"id"`
 	Label      string                      `json:"label"`
 	Properties map[string][]VertexProperty `json:"properties"`
@@ -115,8 +115,27 @@ type Edge struct {
 	Value EdgeValue `json:"@value"`
 }
 
+type EdgeIdValueType struct {
+	RelationId  string
+}
+
+type EdIdType struct {
+	Type  string    `json:"@type"`
+	Value EdgeIdValueType `json:"@value"`
+}
+
 type EdgeValue struct {
 	ID         string // TODO: does this need to be a GenericValue? interface{}?
+	Label      string
+	InVLabel   string
+	OutVLabel  string
+	InV        string
+	OutV       string
+	Properties map[string]EdgeProperty
+}
+
+type EdgeValueV2 struct {
+	ID		   EdIdType
 	Label      string
 	InVLabel   string
 	OutVLabel  string

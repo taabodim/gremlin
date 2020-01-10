@@ -28,7 +28,7 @@ func TestSerializeVertexes(t *testing.T) {
 	}
 	for i, given := range givens {
 		expected := expecteds[i]
-		result, err := SerializeVertexes(given)
+		result, err := DeserializeVertices(given)
 
 		if err != nil || len(result) != len(expected) {
 			t.Error("given", given, "expected", expected, "result", result, "err", err)
@@ -156,13 +156,13 @@ func TestSerializeListInterface(t *testing.T) {
 func TestConvertToCleanVertexes(t *testing.T) {
 	givens := [][]Vertex{
 		{},
-		{MakeDummyVertex("test-id", "label", map[string]interface{}{"health": 1})},
-		{MakeDummyVertex("test-id", "label", map[string]interface{}{"health": 1}), MakeDummyVertex("test-id2", "label", map[string]interface{}{"health": 1})},
+		{MakeDummyVertex("1", "label", map[string]interface{}{"health": 1})},
+		{MakeDummyVertex("2", "label", map[string]interface{}{"health": 1}), MakeDummyVertex("2", "label", map[string]interface{}{"health": 1})},
 	}
 	expecteds := [][]CleanVertex{
 		{},
-		{CleanVertex{Id: "test-id", Label: "label"}},
-		{CleanVertex{Id: "test-id", Label: "label"}, CleanVertex{Id: "test-id2", Label: "label"}},
+		{CleanVertex{Id: 1, Label: "label"}},
+		{CleanVertex{Id: 2, Label: "label"}, CleanVertex{Id: 2, Label: "label"}},
 	}
 
 	for i, given := range givens {

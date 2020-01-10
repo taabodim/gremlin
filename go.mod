@@ -3,6 +3,8 @@ module github.com/taabodim/gremlin
 go 1.12
 
 require (
+	github.com/cbinsights/gremlin v0.0.0-20190513160134-e8ca4d165358
+	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/gorilla/websocket v1.1.0
 	github.com/hashicorp/consul v1.2.0
 	github.com/hashicorp/go-cleanhttp v0.5.0
